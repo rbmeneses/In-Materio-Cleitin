@@ -1,0 +1,6 @@
+{
+  "name": "Simulador In-Materio Cleitin - Arquitetura Paralela & Pulso Fotônico",
+  "description": "Simulador de arquitetura neuromórfica in-materio em silício LGA 775, com telemetria de latência/throughput em tempo real, modulação por SSD, análise de topologias de rede, teoria do pulso fotônico, monitoramento de energia e compressão de dados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
