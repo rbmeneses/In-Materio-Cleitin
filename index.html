@@ -1,21 +1,361 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulador In-Materio Cleitin - Arquitetura Paralela & Pulso Fotônico</title>
-    <meta name="description" content="Simulador de arquitetura neuromórfica in-materio em silício LGA 775, com telemetria de latência/throughput em tempo real, modulação por SSD, análise de topologias de rede, teoria do pulso fotônico, monitoramento de energia e compressão de dados." />
-    <meta property="og:title" content="Simulador In-Materio Cleitin - Arquitetura Paralela & Pulso Fotônico" />
-    <meta property="og:description" content="Simulador de arquitetura neuromórfica in-materio em silício LGA 775, com telemetria de latência/throughput em tempo real, modulação por SSD, análise de topologias de rede, teoria do pulso fotônico, monitoramento de energia e compressão de dados." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cleitin Core v2.0 — Blueprint NPU Analógica USB</title>
+<style>
+:root{--navy:#0a192f;--cyan:#00f0ff;--white:#fff;--muted:#9ab4c9;--grid:#173452;--amber:#ffc857;--red:#ff6b6b}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--navy);color:var(--white);font-family:Consolas,"Courier New",monospace}
+header{height:auto;min-height:70px;padding:14px 18px;border-bottom:1px solid #31516d;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(16px,2vw,24px);margin:0;letter-spacing:.08em;color:#fff}header small{display:block;color:var(--cyan);margin-top:5px;letter-spacing:.12em}
+.controls{display:flex;gap:8px;flex-wrap:wrap}button{background:#102b49;color:#fff;border:1px solid var(--cyan);padding:8px 12px;font:inherit;cursor:pointer;transition:background .15s,transform .1s}button:hover{background:#164466}button:active{transform:scale(.97);background:#00f0ff;color:#0a192f}
+#viewport{height:calc(100% - 84px);overflow:hidden;position:relative;cursor:grab;background-color:var(--navy);background-image:radial-gradient(#21415e 0.7px,transparent .7px);background-size:18px 18px}
+#viewport.dragging{cursor:grabbing}svg{width:100%;height:100%;display:block;touch-action:none}
+.frame{fill:none;stroke:#41627d;stroke-width:2}.gridline{stroke:#183652;stroke-width:1;fill:none}.box{fill:#0d2340;stroke:#fff;stroke-width:1.5}.box-cyan{fill:#0d2340;stroke:var(--cyan);stroke-width:2}.box-warn{fill:#261f2a;stroke:var(--amber);stroke-width:1.5}
+.title{fill:#fff;font-size:22px;font-weight:bold;letter-spacing:2px}.subtitle{fill:var(--cyan);font-size:13px;letter-spacing:1px}.txt{fill:#fff;font-size:12px}.small{fill:#c6d8e6;font-size:10px}.tiny{fill:#c6d8e6;font-size:8.5px}.cyan{fill:var(--cyan)}.amber{fill:var(--amber)}.red{fill:var(--red)}
+.pin{fill:#0a192f;stroke:#fff;stroke-width:1}.pintext{fill:#fff;font-size:9px}.trace{fill:none;stroke:var(--cyan);stroke-width:2.1;stroke-linejoin:round;stroke-linecap:square;opacity:.84;vector-effect:non-scaling-stroke;cursor:pointer}.trace.white{stroke:#fff;stroke-width:1.45}.trace.power{stroke:var(--amber);stroke-width:1.8}.trace.signal{stroke:var(--cyan)}.trace:hover,.trace.active{stroke:#fff;stroke-width:4;opacity:1;filter:drop-shadow(0 0 5px var(--cyan))}
+.trace-label{fill:#d9faff;font-size:9px;paint-order:stroke;stroke:var(--navy);stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.ic{fill:#071323;stroke:#fff;stroke-width:1.6}.notch{fill:none;stroke:#fff;stroke-width:1.2}.node{fill:var(--cyan)}.section{fill:#0b2039;stroke:#45627c;stroke-width:1.2}.bom{fill:#09182b;stroke:#fff;stroke-width:1}.bomtext{fill:#fff;font-size:9px}.bomhead{fill:var(--cyan);font-size:11px;font-weight:bold}
+.note{fill:#271f1c;stroke:var(--amber);stroke-width:1.3}.notetext{fill:#ffe3a1;font-size:10px}.legendtext{fill:#fff;font-size:10px}
+#tip{position:absolute;bottom:12px;left:12px;padding:8px 10px;background:#061323;border:1px solid #00f0ff;color:#d9faff;font-size:11px;pointer-events:none}
+@media(max-width:700px){header{align-items:flex-start}#viewport{height:calc(100% - 120px)}}
+</style>
+</head>
+<body>
+<header>
+ <div><h1>CLEITIN CORE v2.0 — NPU ANALÓGICA USB</h1><small>BLUEPRINT ESQUEMÁTICO · REVISÃO DE ENGENHARIA · INTERATIVO</small></div>
+ <div class="controls">
+   <button type="button" id="zoomIn">ZOOM +</button>
+   <button type="button" id="zoomOut">ZOOM −</button>
+   <button type="button" id="reset">AJUSTAR / RESET</button>
+   <button type="button" id="download">EXPORTAR SVG</button>
+ </div>
+</header>
+<div id="viewport">
+<svg id="blueprint" viewBox="0 0 2200 1500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Blueprint vetorial interativo do Cleitin Core v2.0">
+<defs>
+ <pattern id="minor" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0V25" class="gridline"/></pattern>
+ <pattern id="major" width="125" height="125" patternUnits="userSpaceOnUse"><rect width="125" height="125" fill="url(#minor)"/><path d="M125 0H0V125" stroke="#274967" stroke-width="1.2" fill="none"/></pattern>
+</defs>
+<g id="world">
+<rect x="20" y="20" width="2160" height="1460" class="frame"/><rect x="20" y="20" width="2160" height="1460" fill="url(#major)" opacity=".72"/>
+<text x="55" y="65" class="title">CLEITIN CORE v2.0</text><text x="55" y="88" class="subtitle">NPU ANALÓGICA USB · TOPOLOGIA FUNCIONAL / PINAGEM DE ENCAPSULAMENTO</text>
+<text x="1750" y="60" class="small">PRANCHA 01 / 01</text><text x="1750" y="80" class="small">ESCALA: <tspan id="zoomIndicator">100%</tspan> · REV B</text>
 
+<!-- Host -->
+<rect x="55" y="125" width="410" height="300" rx="5" class="box-cyan"/>
+<text x="75" y="155" class="subtitle">01 · HOST PC / CAMADA DIGITAL</text>
+<rect x="80" y="180" width="170" height="78" class="box"/><text x="95" y="204" class="txt">LLM LOCAL</text><text x="95" y="222" class="small">Ollama · inferência</text><text x="95" y="240" class="small">prompt / contexto</text>
+<rect x="270" y="180" width="170" height="78" class="box"/><text x="285" y="204" class="txt">MATRIZ 16 × 16</text><text x="285" y="222" class="small">estocástica · 20% GABA</text><text x="285" y="240" class="small">inibição / normalização</text>
+<rect x="80" y="280" width="360" height="55" class="box"/><text x="95" y="303" class="txt">SQLite · WAL</text><text x="95" y="321" class="small">persistência · telemetria · estado dos pesos</text>
+<path d="M165 258V270H355V258M165 270V280M355 270V280" class="trace white" data-net="Barramento Interno Host (LLM <-> Matriz 16x16 <-> SQLite WAL)"/>
+<rect x="80" y="355" width="360" height="48" class="box-warn"/><text x="95" y="375" class="notetext">USB CDC / UART BRIDGE</text><text x="95" y="391" class="small">baud configurável até 2 Mbaud · protocolo enquadrado</text>
+
+<!-- ESP32 -->
+<rect x="530" y="125" width="440" height="470" rx="5" class="box-cyan"/>
+<text x="550" y="155" class="subtitle">02 · ESP32 DEVKIT V1 · ESP32-WROOM-32</text>
+<rect x="660" y="185" width="180" height="345" rx="5" class="ic"/>
+<rect x="720" y="175" width="60" height="15" class="ic"/><text x="682" y="215" class="txt">ESP32</text><text x="684" y="232" class="small">WROOM-32</text>
+<g class="small">
+<text x="550" y="205">GPIO25 · DAC1</text><text x="550" y="235">GPIO26 · DAC2</text><text x="550" y="265">GPIO36 · ADC1 / MUX SIG</text><text x="550" y="295">GPIO39 · ADC1 / NTC</text>
+<text x="550" y="325">GPIO14 · MUX S0</text><text x="550" y="345">GPIO27 · MUX S1</text><text x="550" y="365">GPIO32 · MUX S2</text><text x="550" y="385">GPIO33 · MUX S3</text>
+<text x="850" y="205">GPIO18 · PWM FAN</text><text x="850" y="235">GPIO19 · PWM HEATER</text><text x="850" y="275">GPIO21 · SDA</text><text x="850" y="305">GPIO22 · SCL</text>
+<text x="850" y="365">3V3 · lógica</text><text x="850" y="395">GND · comum</text>
+</g>
+<g>
+<circle cx="650" cy="201" r="4" class="node"/><circle cx="650" cy="231" r="4" class="node"/><circle cx="650" cy="261" r="4" class="node"/><circle cx="650" cy="291" r="4" class="node"/>
+<circle cx="650" cy="321" r="4" class="node"/><circle cx="650" cy="341" r="4" class="node"/><circle cx="650" cy="361" r="4" class="node"/><circle cx="650" cy="381" r="4" class="node"/>
+<circle cx="850" cy="201" r="4" class="node"/><circle cx="850" cy="231" r="4" class="node"/><circle cx="850" cy="271" r="4" class="node"/><circle cx="850" cy="301" r="4" class="node"/>
+</g>
+<text x="550" y="560" class="small">ADC1 usado (GPIO36/39): evita conflito com Wi-Fi do ADC2.</text>
+<text x="550" y="577" class="small">GPIO36/39 são somente entrada; sem pull-up/pull-down interno.</text>
+
+<!-- USB path -->
+<path d="M440 379H490V215H650" class="trace white" data-net="Barramento Serial USB 2 Mbps (Host PC <-> ESP32)"/><text x="480" y="198" class="trace-label">USB ⇢ UART / serial</text>
+
+<!-- Analog tree -->
+<rect x="1030" y="125" width="590" height="720" rx="5" class="box-cyan"/>
+<text x="1050" y="155" class="subtitle">03 · ÁRVORE ANALÓGICA / SUB-BIAS</text>
+<rect x="1060" y="180" width="530" height="105" class="section"/>
+<text x="1075" y="202" class="txt">REFERÊNCIA VIRTUAL VREST — 1,65 V (ALVO)</text>
+<rect x="1080" y="218" width="100" height="45" class="box"/><text x="1093" y="237" class="small">+3V3</text><text x="1093" y="252" class="small">ou ref</text>
+<rect x="1220" y="218" width="100" height="45" class="box"/><text x="1230" y="237" class="small">R1 10k</text><text x="1230" y="252" class="small">divisor</text>
+<rect x="1360" y="218" width="100" height="45" class="box"/><text x="1370" y="237" class="small">R2 10k</text><text x="1370" y="252" class="small">divisor</text>
+<path d="M1180 240H1220M1320 240H1360M1460 240H1510" class="trace power" data-net="Divisor Resistivo V_rest (1,65 V)"/><text x="1510" y="244" class="small">GND</text>
+<path d="M1320 240V275H1540" class="trace power" data-net="Saída V_rest Bufferizada (1,65 V)"/><text x="1465" y="273" class="trace-label">VREF buffer → Vrest</text>
+
+<!-- NE5532 pinout -->
+<rect x="1060" y="310" width="250" height="185" class="section"/>
+<text x="1075" y="332" class="txt">U1 · NE5532 · DIP-8</text>
+<rect x="1140" y="350" width="90" height="110" rx="3" class="ic"/><path d="M1170 350q15 16 30 0" class="notch"/>
+<g class="pintext">
+<text x="1080" y="365">1 OUT A</text><text x="1080" y="390">2 −IN A</text><text x="1080" y="415">3 +IN A</text><text x="1080" y="440">4 V−</text>
+<text x="1240" y="365">8 V+</text><text x="1240" y="390">7 OUT B</text><text x="1240" y="415">6 −IN B</text><text x="1240" y="440">5 +IN B</text></g>
+<text x="1075" y="480" class="tiny">Tronco: DAC1 / DAC2 / FB folha 16 via rede</text>
+<rect x="1330" y="310" width="260" height="185" class="note"/>
+<text x="1345" y="334" class="notetext">NOTA DE PINAGEM (NE5532)</text>
+<text x="1345" y="355" class="notetext">Pino 7 = OUT B (Seguidor de Tensão).</text>
+<text x="1345" y="375" class="notetext">Vrest usa divisor R1/R2 + buffer OpAmp B</text>
+<text x="1345" y="395" class="notetext">para referenciar as entradas (+)</text>
+<text x="1345" y="415" class="notetext">sem drenar corrente do divisor.</text>
+<text x="1345" y="450" class="small">R=47k + C=1µF no loop de feedback</text>
+<text x="1345" y="468" class="small">da Folha 16 para o Tronco (-IN A).</text>
+
+<!-- TL074 branch -->
+<rect x="1060" y="515" width="530" height="105" class="section"/>
+<text x="1075" y="538" class="txt">U2 · TL074 DIP-14 — 4 RAMOS DENDRÍTICOS</text>
+<rect x="1090" y="550" width="180" height="55" class="ic"/><text x="1110" y="573" class="small">DIP-14 · QUAD JFET</text><text x="1110" y="590" class="small">4 × amplificadores</text>
+<text x="1290" y="560" class="small">1 OUT1 · 2 −IN1 · 3 +IN1 · 4 V+</text>
+<text x="1290" y="578" class="small">5 +IN2 · 6 −IN2 · 7 OUT2 · 11 V−</text>
+<text x="1290" y="596" class="small">8 OUT3 · 9 −IN3 · 10 +IN3 · 14 OUT4</text>
+
+<!-- Leaves -->
+<text x="1060" y="650" class="txt">U3–U6 · 4 × TL074 DIP-14 → 16 FOLHAS AXONIAIS LIF / RC</text>
+<g id="leaves"></g>
+<rect x="1060" y="790" width="530" height="40" class="box-warn"/><text x="1075" y="806" class="notetext">Operação Sub-Bias: TL074/NE5532 alimentados em +5V a +9V com Vrest = 1,65V</text><text x="1075" y="821" class="notetext">para induzir compressão suave (soft-clipping sigmoide) antes do divisor ADC.</text>
+
+<!-- MUX -->
+<rect x="1660" y="125" width="475" height="310" rx="5" class="box-cyan"/>
+<text x="1680" y="155" class="subtitle">04 · MULTIPLEXAÇÃO ANALÓGICA</text>
+<rect x="1710" y="185" width="170" height="190" class="ic"/><text x="1730" y="210" class="txt">U7 · CD74HC4067</text><text x="1740" y="228" class="small">DIP-24</text>
+<text x="1680" y="250" class="small">C0–C15</text><text x="1680" y="268" class="small">16 entradas</text><text x="1680" y="286" class="small">analógicas</text>
+<text x="1900" y="220" class="small">SIG / COM → GPIO36</text><text x="1900" y="250" class="small">S0–S3 → 14/27/32/33</text><text x="1900" y="280" class="small">/EN → GND (Ativo)</text><text x="1900" y="310" class="small">VCC → 3V3 (lógica ESP)</text><text x="1900" y="340" class="small">GND → comum analógico</text>
+<text x="1680" y="405" class="tiny">*CD74HC4067E em soquete DIP-24 varrendo as 16 folhas a 100 kHz.</text>
+
+<!-- I2C -->
+<rect x="1660" y="465" width="475" height="260" rx="5" class="box-cyan"/>
+<text x="1680" y="495" class="subtitle">05 · EXPANSÃO I²C / 32 SAÍDAS DIGITAIS</text>
+<g>
+<rect x="1690" y="525" width="190" height="145" class="ic"/><text x="1710" y="550" class="txt">U8 · MCP23017</text><text x="1710" y="570" class="small">DIP-28 · A2:A0=000</text><text x="1710" y="590" class="small">endereço 0x20</text><text x="1710" y="615" class="small">GPA0–7 · GPB0–7</text><text x="1710" y="640" class="small">Portas I/O 01 a 16</text>
+<rect x="1910" y="525" width="190" height="145" class="ic"/><text x="1930" y="550" class="txt">U9 · MCP23017</text><text x="1930" y="570" class="small">DIP-28 · A2:A0=001</text><text x="1930" y="590" class="small">endereço 0x21</text><text x="1930" y="615" class="small">GPA0–7 · GPB0–7</text><text x="1930" y="640" class="small">Portas I/O 17 a 32</text>
+</g>
+<text x="1680" y="700" class="small">SDA/SCL compartilhados · pull-ups 4.7k para 3V3 · RESET em 3V3.</text>
+
+<!-- Thermal -->
+<rect x="530" y="650" width="440" height="360" rx="5" class="box-cyan"/>
+<text x="550" y="680" class="subtitle">06 · PONTE TÉRMICA / HOMEOSTASE</text>
+<rect x="560" y="710" width="175" height="95" class="box"/><text x="575" y="735" class="txt">NTC 10k</text><text x="575" y="755" class="small">divisor R=10k</text><text x="575" y="775" class="small">ADC GPIO39</text>
+<rect x="770" y="710" width="170" height="95" class="box"/><text x="785" y="735" class="txt">CONTROLE</text><text x="785" y="755" class="small">T &gt; 45°C: Febre/Sonho</text><text x="785" y="775" class="small">T &lt; 34°C: Letargia</text>
+<rect x="560" y="840" width="175" height="105" class="box"/><text x="575" y="865" class="txt">Q1 · IRLZ44N</text><text x="575" y="885" class="small">low-side heater</text><text x="575" y="905" class="small">GPIO19 PWM</text><text x="575" y="925" class="small">22Ω / 5W</text>
+<rect x="770" y="840" width="170" height="105" class="box"/><text x="785" y="865" class="txt">Q2 · IRLZ44N</text><text x="785" y="885" class="small">low-side fan</text><text x="785" y="905" class="small">GPIO18 PWM</text><text x="785" y="925" class="small">micro-cooler 5V</text>
+<path d="M735 757H770M855 805V825H647V840M855 825H855V840" class="trace power" data-net="Malha de Controle Térmico (NTC -> MOSFETs Q1/Q2)"/>
+<text x="550" y="975" class="small">Barramento de alumínio unificado colado sobre os CIs DIP.</text>
+<text x="550" y="992" class="tiny">*Resistor de 22Ω 5W induz aumento controlado de ruído Johnson-Nyquist.</text>
+
+<!-- GPIO and bus traces -->
+<path d="M850 201H1000V335H1060" class="trace signal" data-net="DAC1 (GPIO25) -> Entrada Estímulo Tronco NE5532"/><text x="905" y="190" class="trace-label">DAC1 · GPIO25</text>
+<path d="M850 231H985V350H1060" class="trace signal" data-net="DAC2 (GPIO26) -> Modulação de Entropia / Bias"/><text x="900" y="247" class="trace-label">DAC2 · GPIO26</text>
+<path d="M1590 710H1630V255H1710" class="trace signal" data-net="Saídas das 16 Folhas (TL074) -> Entradas C0-C15 do MUX"/><text x="1600" y="245" class="trace-label">C0–C15</text>
+<path d="M1880 375H1890V220H1900" class="trace white" data-net="Pino Comum SIG do Multiplexador CD74HC4067"/>
+<path d="M850 271H1000V900H1710V375" class="trace signal" data-net="Retorno Analógico MUX SIG -> GPIO36 (ADC1 12-bits)"/><text x="1005" y="890" class="trace-label">ADC MUX SIG → GPIO36</text>
+<path d="M850 301H995V757H560" class="trace signal" data-net="Leitura Térmica NTC 10k -> GPIO39 (ADC1)"/><text x="970" y="745" class="trace-label">NTC → GPIO39</text>
+<path d="M850 271H1015V470H1660" class="trace white" data-net="Barramento I2C SDA (GPIO21) -> 2x MCP23017"/><text x="1020" y="458" class="trace-label">I²C SDA/SCL via GPIO21/22 (par)</text>
+<path d="M850 301H1030V480H1660" class="trace white" data-net="Barramento I2C SCL (GPIO22) -> 2x MCP23017"/>
+<path d="M850 201H1005V980H560" class="trace power" data-net="Acionamento PWM Aquecedor (GPIO19 -> Q1 IRLZ44N)"/><text x="1008" y="970" class="trace-label">PWM GPIO18 / GPIO19</text>
+<path d="M850 231H1025V1000H770" class="trace power" data-net="Acionamento PWM Micro-Cooler (GPIO18 -> Q2 IRLZ44N)"/>
+
+<!-- MUX selects -->
+<path d="M650 321H1000V410H1680" class="trace white" data-net="Seletor Endereço MUX S0 (GPIO14)"/>
+<path d="M650 341H1010V420H1680" class="trace white" data-net="Seletor Endereço MUX S1 (GPIO27)"/>
+<path d="M650 361H1020V430H1680" class="trace white" data-net="Seletor Endereço MUX S2 (GPIO32)"/>
+<path d="M650 381H1030V440H1680" class="trace white" data-net="Seletor Endereço MUX S3 (GPIO33)"/>
+<text x="1060" y="425" class="trace-label">S0/S1/S2/S3 — GPIO14/27/32/33</text>
+
+<!-- BOM -->
+<rect x="1030" y="875" width="1105" height="535" rx="4" class="box-cyan"/>
+<text x="1050" y="905" class="subtitle">07 · BOM — LISTA DE MATERIAIS E PARÂMETROS</text>
+<g id="bomRows"></g>
+<rect x="1050" y="1340" width="1065" height="48" class="note"/>
+<text x="1065" y="1360" class="notetext">Todos os CIs lógicos e analógicos operam em soquetes DIP Through-Hole de passo 2,54 mm</text>
+<text x="1065" y="1377" class="notetext">para substituição rápida e isolamento térmico durante a soldagem manual.</text>
+
+<!-- Legend -->
+<rect x="55" y="1050" width="915" height="360" class="section"/>
+<text x="75" y="1080" class="subtitle">LEGENDA TÉCNICA / NOTAS DE PROJETO</text>
+<path d="M80 1110H160" class="trace"/><text x="180" y="1114" class="legendtext">Trilha de sinal analógico</text>
+<path d="M80 1140H160" class="trace white"/><text x="180" y="1144" class="legendtext">Sinal digital / barramento</text>
+<path d="M80 1170H160" class="trace power"/><text x="180" y="1174" class="legendtext">Alimentação / acionamento</text>
+<rect x="80" y="1195" width="80" height="22" class="box"/><text x="180" y="1211" class="legendtext">Bloco funcional / encapsulamento</text>
+<rect x="80" y="1235" width="80" height="22" class="note"/><text x="180" y="1251" class="legendtext">Nota de engenharia / calibração</text>
+<text x="520" y="1110" class="small">• ESP32-WROOM-32: DAC 8-bit em GPIO25/26.</text>
+<text x="520" y="1135" class="small">• USB 2 Mbps = taxa UART/CDC configurada para baixa latência.</text>
+<text x="520" y="1160" class="small">• MCP23017 entrega 32 portas com estados 0.10 / 0.25 / 0.75 / 1.00</text>
+<text x="535" y="1178" class="small">codificados por densidade temporal (bitstream estocástico).</text>
+<text x="520" y="1205" class="small">• NTC 10k Beta=3950 lê temperatura real da régua de alumínio.</text>
+<text x="535" y="1223" class="small">• Divisores 10k/22k limitam a tensão máxima no ADC em 3,3V.</text>
+<text x="520" y="1250" class="small">• MOSFET IRLZ44N acionado direto em 3,3V com resistor Gate 220Ω.</text>
+<text x="520" y="1275" class="small">• Diodo 1N4007 em antiparalelo com o cooler 5V para proteção.</text>
+<text x="520" y="1320" class="small">• Desacoplamento de 100nF cerâmico próximo ao pino VCC de cada CI.</text>
+<text x="75" y="1375" class="notetext">STATUS: BLUEPRINT INTERATIVO CORRIGIDO — Botões de Zoom, Reset, Pan e Exportação SVG ativos.</text>
+
+<text x="55" y="1445" class="small">CLEITIN CORE v2.0 · BLUEPRINT INTERATIVO · Zoom: roda do rato / botões · Pan: arrastar</text>
+<text x="1750" y="1445" class="small">ARQUIVO HTML AUTÔNOMO</text>
+</g>
+</svg>
+<div id="tip">Passe o rato sobre uma trilha para destacá-la · Arraste para mover · Roda do rato ou botões para zoom</div>
+</div>
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+
+// 1. Renderiza as 16 folhas (U3 a U6)
+const leaves = document.getElementById('leaves');
+const caps = ['100nF','100nF','100nF','100nF','22nF','22nF','22nF','22nF','4.7nF','4.7nF','4.7nF','4.7nF','10nF','10nF','10nF','10nF'];
+for (let i = 0; i < 16; i++) {
+  const col = i % 4, row = Math.floor(i / 4), x = 1065 + col * 132, y = 665 + row * 29;
+  const g = document.createElementNS(NS, 'g');
+  g.innerHTML = `<rect x="${x}" y="${y}" width="120" height="23" class="box"/><text x="${x+6}" y="${y+15}" class="tiny">F${i+1} · U${3+Math.floor(i/4)} / A${i%4+1}</text><text x="${x+72}" y="${y+15}" class="tiny cyan">${caps[i]}</text>`;
+  leaves.appendChild(g);
+}
+
+// 2. Renderiza a tabela BOM (Corrigida a duplicação do identificador 'bom')
+const bomContainer = document.getElementById('bomRows');
+bomContainer.innerHTML = `<text x="1065" y="935" class="bomhead">GRUPO</text><text x="1245" y="935" class="bomhead">ITEM</text><text x="1690" y="935" class="bomhead">QTD / VALOR</text><text x="1850" y="935" class="bomhead">OBSERVAÇÃO</text><path d="M1055 945H2115" stroke="#00f0ff"/>`;
+
+const bomData = [
+  ['SEMICONDUTORES','ESP32 DevKit V1 / WROOM-32','1 un.','Ponte USB 2 Mbps + Dual DAC + ADC1'],
+  ['','NE5532P DIP-8','1 un.','Tronco (OpAmp A) + Buffer Vrest (OpAmp B)'],
+  ['','TL074CN DIP-14','5 un.','1 Ramo (4x) + 4 Folhas (16x) = 20 OpAmps'],
+  ['','CD74HC4067E DIP-24','1 un.','Multiplexador analógico 16:1 (100 kHz)'],
+  ['','MCP23017-E/SP DIP-28','2 un.','32 portas I/O via I2C (0x20 e 0x21)'],
+  ['','IRLZ44N TO-220','2 un.','MOSFET Logic-Level para Cooler e Heater'],
+  ['PASSIVOS','Resistores 10kΩ','20+ un.','Divisor Vref, NTC e entradas R_in'],
+  ['','Resistores 47kΩ','18 un.','Malhas de ganho e Loop da Folha 16'],
+  ['','Capacitores 1µF / 10µF','4 un.','Acoplamento do Loop e filtro Vrest'],
+  ['','Capacitores F1–F4 (Grave)','4 × 100nF','Constante de tempo tau_m longa (Foco)'],
+  ['','Capacitores F5–F8 (Médio)','4 × 22nF','Constante de tempo média (Curiosidade)'],
+  ['','Capacitores F9–F12 (Agudo)','4 × 4,7nF','Constante de tempo curta (Criatividade)'],
+  ['','Capacitores F13–F16 (Impulso)','4 × 10nF','Alto ganho + realimentação de Ego'],
+  ['','Divisores de saída ADC','16 × (10k+22k)','Proteção de limite 3,3V para o GPIO36'],
+  ['TÉRMICA','Termistor NTC 10kΩ @25°C','1 un.','Curva Beta=3950 colado aos CIs'],
+  ['','Aquecedor 22Ω / 5W Porcelana','1 un.','Indutor de febre/entropia (>45°C)'],
+  ['','Micro-cooler 5V DC','1 un.','Resfriamento de homeostase (<35°C)'],
+  ['','Resistores Gate / Pull-down','4 un.','220Ω em série + 100kΩ Gate-GND'],
+  ['','Diodo 1N4007 Flyback','1 un.','Proteção contra pico indutivo do cooler'],
+  ['ALIMENTAÇÃO','Barramento +5V / +3,3V','1 conj.','Alimentação Sub-Bias e lógica I2C'],
+  ['','Desacoplamento 100nF Cerâmico','9 un.','1 capacitor colado ao VCC de cada CI']
+];
+
+bomData.forEach((r, i) => {
+  const y = 966 + i * 16.8;
+  const cols = [1065, 1245, 1690, 1850];
+  cols.forEach((xPos, idx) => {
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('x', xPos);
+    t.setAttribute('y', y);
+    t.setAttribute('class', 'bomtext');
+    t.textContent = r[idx];
+    bomContainer.appendChild(t);
+  });
+  if (i % 2 === 0) {
+    const line = document.createElementNS(NS, 'path');
+    line.setAttribute('d', `M1055 ${y+4}H2115`);
+    line.setAttribute('stroke', '#1c3b58');
+    line.setAttribute('stroke-width', '.7');
+    bomContainer.appendChild(line);
+  }
+});
+
+// 3. Controladores de Zoom, Pan e Botões do Cabeçalho
+const svg = document.getElementById('blueprint');
+const world = document.getElementById('world');
+const vp = document.getElementById('viewport');
+const tip = document.getElementById('tip');
+const zoomInd = document.getElementById('zoomIndicator');
+
+let scale = 1.0, tx = 0, ty = 0, dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+
+function applyTransform() {
+  world.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
+  if (zoomInd) zoomInd.textContent = `${Math.round(scale * 100)}%`;
+}
+
+function zoom(factor, cx = 1100, cy = 750) {
+  const nextScale = Math.max(0.35, Math.min(3.5, scale * factor));
+  tx = cx - (cx - tx) * (nextScale / scale);
+  ty = cy - (cy - ty) * (nextScale / scale);
+  scale = nextScale;
+  applyTransform();
+}
+
+document.getElementById('zoomIn').addEventListener('click', () => zoom(1.25));
+document.getElementById('zoomOut').addEventListener('click', () => zoom(0.8));
+document.getElementById('reset').addEventListener('click', () => {
+  scale = 1.0;
+  tx = 0;
+  ty = 0;
+  applyTransform();
+  tip.textContent = 'Visualização restaurada para 100% · Arraste para mover';
+});
+
+// Zoom com roda do rato
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = svg.getBoundingClientRect();
+  const mx = ((e.clientX - rect.left) / rect.width) * 2200;
+  const my = ((e.clientY - rect.top) / rect.height) * 1500;
+  zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, mx, my);
+}, { passive: false });
+
+// Arrastar (Pan) no canvas SVG
+svg.addEventListener('pointerdown', e => {
+  if (e.target.closest('button')) return;
+  dragging = true;
+  vp.classList.add('dragging');
+  sx = e.clientX;
+  sy = e.clientY;
+  ox = tx;
+  oy = ty;
+  svg.setPointerCapture(e.pointerId);
+});
+
+svg.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const rect = svg.getBoundingClientRect();
+  tx = ox + (e.clientX - sx) * (2200 / rect.width);
+  ty = oy + (e.clientY - sy) * (1500 / rect.height);
+  applyTransform();
+});
+
+svg.addEventListener('pointerup', e => {
+  dragging = false;
+  vp.classList.remove('dragging');
+  if (svg.hasPointerCapture(e.pointerId)) svg.releasePointerCapture(e.pointerId);
+});
+
+// Destaque interativo das trilhas
+document.querySelectorAll('.trace').forEach(t => {
+  t.addEventListener('mouseenter', () => {
+    t.classList.add('active');
+    const netName = t.getAttribute('data-net') || 'Trilha selecionada';
+    tip.textContent = `Trilha Ativa: ${netName}`;
+  });
+  t.addEventListener('mouseleave', () => {
+    t.classList.remove('active');
+    tip.textContent = 'Passe o rato sobre uma trilha para destacá-la · Arraste para mover · Roda do rato ou botões para zoom';
+  });
+});
+
+// Exportar SVG autónomo (com estilos CSS embutidos)
+document.getElementById('download').addEventListener('click', () => {
+  const clone = svg.cloneNode(true);
+  clone.setAttribute('xmlns', NS);
+  const styleEl = document.createElementNS(NS, 'style');
+  styleEl.textContent = document.querySelector('style').textContent;
+  clone.insertBefore(styleEl, clone.firstChild);
+
+  const blob = new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Cleitin_Core_v2_Blueprint.svg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  tip.textContent = 'Ficheiro Cleitin_Core_v2_Blueprint.svg exportado com sucesso!';
+});
+
+applyTransform();
+</script>
+</body>
+</html>
